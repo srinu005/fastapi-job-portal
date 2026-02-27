@@ -1,0 +1,28 @@
+services:
+  # Service 1: The Database
+  db:
+    image: postgres:15
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=jobboard
+    ports:
+      - "5432:5432"
+
+  # Service 2: Our FastAPI App
+  web:
+    build: .
+    command: fastapi run main.py --port 8000 --host 0.0.0.0
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://user:password@db:5432/jobboard
+    depends_on:
+      - db
+
+volumes:
+  postgres_data:
